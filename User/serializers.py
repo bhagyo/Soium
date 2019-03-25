@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, Serializer, ListSerializer
-from rest_framework.fields import BooleanField, CharField, DateField, EmailField, ImageField, IntegerField
+from rest_framework.fields import BooleanField, CharField, DateField, EmailField, ImageField, IntegerField, FileField
 from rest_framework.exceptions import NotFound, ValidationError
-
+import csv, io, re
 from .models import Sign, RReading
 
 
@@ -106,17 +106,37 @@ class LoginSerializer(Serializer):
     def create(self, validated_data):
         return validated_data
 
-    def update(self, instance, validated_data):
+    def update(self, instance):
         return instance
 
 
 class RReadingSerializer(ModelSerializer):
     class Meta:
         model = RReading
-        fields = '__all__'
+        exclude = ['id', 'user']
 
     def create(self, validated_data):
-
-        ''' fsdfsdf'''
         RReading.objects.create(**validated_data)
+        return validated_data
+
+
+class RReadingCSVSerializer(ModelSerializer):
+    file = FileField(label='Upload File')
+
+    class Meta:
+        model = RReading
+        exclude = ['id', ]
+
+    def create(self, validated_data):
+        csv_input = validated_data.pop('file', None)
+        id = validated_data.get("user")
+        csv_file = csv_input
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, 'Please select a CSV file')
+        data_set = csv_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)
+        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+            RReading.objects.create(user=id, intensity=column[0], level=column[1])
+
         return validated_data

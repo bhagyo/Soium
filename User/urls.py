@@ -1,6 +1,6 @@
 from django.urls import path, include
 from django.conf.urls import include
-from .views import (UserCreateAPIView, LoginAPIView, RReadingAPIView, RReadingListAPIView)
+from .views import (UserCreateAPIView, LoginAPIView, RReadingAPIView, RReadingListAPIView, RReadingCSVAPIView)
 
 urlpatterns = [
 
@@ -10,4 +10,5 @@ urlpatterns = [
 
     path('readinglist/', RReadingListAPIView.as_view(), name='readinglist'),
     path('reading/', RReadingAPIView.as_view(), name='reading'),
+    path('readingcsv/', RReadingCSVAPIView.as_view(), name='readingcsv'),
 ]

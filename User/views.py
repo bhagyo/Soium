@@ -21,7 +21,8 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Sign, RReading
-from .serializers import RegisterSerializer, UserSerializer, LoginSerializer, RReadingSerializer
+from .serializers import RegisterSerializer, UserSerializer, LoginSerializer, RReadingSerializer, RReadingCSVSerializer
+from django.contrib.auth.decorators import permission_required
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -66,39 +67,4 @@ class RReadingListAPIView(ListAPIView):
 
 class RReadingCSVAPIView(CreateAPIView):
     queryset = RReading.objects.all()
-    serializer_class = RReadingSerializer
-
-
-def CSVFileUpload(request):
-    if request.method == 'GET':
-        csv_file = request.FILES['uploadFile']
-        decoded_file = csv_file.read().decode('UTF-8')
-        io_string = io.StringIO(decoded_file)
-        next(io_string)   #for skipping the very first line
-
-        for column in csv.reader(io_string, delimiter='"', quotechar="|"):
-            _, created = RReading.objects.update_or_create(
-                user = column[0],
-                intensity = column[1],
-                level = column[2]
-            )
-        context = {}
-        return render(request,"csvUpload.html",context)
-
-'''
-            info = line[0].split(',')
-            validationFlage = True
-            validationFlage = ipCheck(info)
-            if validationFlage == True:
-                validationFlage = circuitFormatCheck(info)
-
-            if validationFlage == False:
-                print(info)
-            else:
-                cus = RReading(user=info[0], level=info[1], intensity=[2])
-                print(cus)
-                cus.save()
-        return HttpResponse('its  done pls check the database')
-
-        return render(request,"csvUpload.html")
-'''
+    serializer_class = RReadingCSVSerializer
