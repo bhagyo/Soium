@@ -10,8 +10,9 @@ from .models import Sign, RReading
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','first_name', 'last_name', 'username', 'email']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email']
         read_only_fields = ['username']
+
 
 class RegisterSerializer(Serializer):
     first_name = CharField(label='First Name', max_length=30, required=False, allow_null=True, allow_blank=True,
@@ -59,8 +60,8 @@ class RegisterSerializer(Serializer):
 
         user = User.objects.create_user(**user_data)
 
-        #user_address_data = validated_data['address'
-        #address = Address.objects.create(**user_address_data)
+        # user_address_data = validated_data['address'
+        # address = Address.objects.create(**user_address_data)
 
         user_profile_sign = dict()
         user_profile_sign['phone'] = validated_data.get('phone')
@@ -108,11 +109,14 @@ class LoginSerializer(Serializer):
     def update(self, instance, validated_data):
         return instance
 
+
 class RReadingSerializer(ModelSerializer):
     class Meta:
         model = RReading
-        exclude = ['id']
+        fields = '__all__'
 
     def create(self, validated_data):
-        RReading.objects.create_obj(validated_data)
+
+        ''' fsdfsdf'''
+        RReading.objects.create(**validated_data)
         return validated_data
